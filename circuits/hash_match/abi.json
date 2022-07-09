@@ -1,0 +1,28 @@
+{
+  "inputs": [
+    {
+      "name": "num",
+      "public": false,
+      "type": "u64"
+    },
+    {
+      "name": "salt",
+      "public": false,
+      "type": "array",
+      "components": {
+        "size": 4,
+        "type": "u64"
+      }
+    },
+    {
+      "name": "hash",
+      "public": true,
+      "type": "array",
+      "components": {
+        "size": 4,
+        "type": "u64"
+      }
+    }
+  ],
+  "outputs": []
+}
