@@ -134,6 +134,19 @@ function hashing(uint64 choice, uint64[4] memory salt) external pure returns(byt
     - **This doesn't restrict the attacker to not use the same inputs as the other player. Thus drawing the game but restricts the attacker to not know the exact choice before the revealChoice function.**
 
 ---
+Commands to run the project:
+
+Run `npm install`
+then `npx hardhat test`
+
+Things that have been improved in this game:
+- Concurrent Games
+- Storage Optimizations
+- Pull reward mechanism
+- usage of reentrancy guard
+
+
+---
 
 ### Verifier.sol
 
@@ -345,11 +358,4 @@ contract Verifier {
 }
 
 ```
-
-
-The things we have improved in this game.
-	- Concurrent Games
-	- Storage Optimizations
-	- Pull reward mechanism
-	- usage of reentrancy guard
 
