@@ -21,5 +21,5 @@ module.exports = {
   gasReporter: {
     enabled: true
   },
-  solidity: "0.8.10",
+  solidity: "0.8.7",
 };

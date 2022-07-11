@@ -189,7 +189,7 @@ contract Verifier {
     }
     function verifyTx(
             Proof memory proof, uint[4] memory input
-        ) public view returns (bool r) {
+        ) external view returns (bool r) {
         uint[] memory inputValues = new uint[](4);
         
         for(uint i = 0; i < input.length; i++){

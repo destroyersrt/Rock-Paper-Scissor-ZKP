@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity 0.8.10;
+pragma solidity 0.8.7;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./verifier.sol";
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 
 contract Game is ReentrancyGuard{
@@ -43,6 +43,9 @@ contract Game is ReentrancyGuard{
     // current Number of games
     uint256 public gameCount;
 
+    // msg.sender not a player in the game
+    error NotPlayer(address sender);
+
 
     constructor(Verifier _verifier) {
 
@@ -70,7 +73,7 @@ contract Game is ReentrancyGuard{
             }
 
             mat.state = GameState.Open;
-            mat.player1 = payable(msg.sender);
+            mat.player1 = msg.sender;
             
             gameId = gameCount;
             gameCount++;
@@ -151,8 +154,7 @@ contract Game is ReentrancyGuard{
 
         } else {
             // todo return an error saying not the player;
-            return;
-        
+            revert NotPlayer(msg.sender);
         }
 
         if(games[gameId].encodedChoiceP1[0] != 0  && games[gameId].encodedChoiceP2[0] != 0) {
@@ -164,7 +166,7 @@ contract Game is ReentrancyGuard{
 
     }
 
-    function submitProof(uint256 gameId, Verifier.Proof memory _proof) 
+    function submitProof(uint256 gameId, Verifier.Proof memory proof) 
         external 
         {
 
@@ -207,7 +209,7 @@ contract Game is ReentrancyGuard{
             }
             // EXTERNAL CALL
 
-            games[gameId].proofs[0] = verifier.verifyTx(_proof,encodedChoice);
+            games[gameId].proofs[0] = verifier.verifyTx(proof,encodedChoice);
 
         } else if (msg.sender == games[gameId].player2) {
 
@@ -219,11 +221,11 @@ contract Game is ReentrancyGuard{
             
             }
         
-            games[gameId].proofs[1] = verifier.verifyTx(_proof,encodedChoice);
+            games[gameId].proofs[1] = verifier.verifyTx(proof,encodedChoice);
         
         } else {
             // todo return an error - caller not a player
-            return;
+            revert NotPlayer(msg.sender);
         }
 
 
@@ -289,7 +291,7 @@ contract Game is ReentrancyGuard{
 
         } else {
             // todo return an error - caller not a player
-            return;
+            revert NotPlayer(msg.sender);
         }
 
         if(games[gameId].isRevealed[0] && games[gameId].isRevealed[1]) {
@@ -352,13 +354,14 @@ contract Game is ReentrancyGuard{
             require(msg.sender == games[gameId].player1 && msg.sender != address(0));
             require(games[gameId].state == GameState.Open, "Game should be in joining state");
 
-            if(games[gameId].betMatch == true) {
+            //  ---- EFFECTS
+
+            if(games[gameId].betMatch) {
             
                 claims[msg.sender] += games[gameId].betSize;
             
             }
 
-            //  ---- EFFECTS
             
             games[gameId].state = GameState.Abandoned;
 
@@ -372,6 +375,7 @@ contract Game is ReentrancyGuard{
             require(claims[msg.sender] != 0, "You don't have anything to claim");
             
             // ---- EFFECTS ----
+            claims[msg.sender] = 0;
             // ---- INTERACTION ----
             (bool success, ) = msg.sender.call{value: claims[msg.sender]}("");
             require(success, "Transfer failed.");
@@ -419,7 +423,7 @@ contract Game is ReentrancyGuard{
         }
 
     receive() external payable{
-
+        claims[owner] += msg.value;
     }
 
     fallback() external payable {
