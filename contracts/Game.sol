@@ -60,7 +60,7 @@ contract Game is ReentrancyGuard{
         returns(uint gameId) 
         {
             // ---- CHECKS ----
-            require(msg.sender != address(0), "Call from invalid address");
+
 
             // ---- EFFECTS ----
             Match storage mat = games[gameCount];
@@ -85,8 +85,6 @@ contract Game is ReentrancyGuard{
         payable
         {
             // ---- CHECKS
-
-            require(msg.sender != address(0), "Call from invalid Address");
             require(games[gameId].player1 != address(0),"No game with this GameId");
             require(games[gameId].player1 != msg.sender, "You can't verse yourself");
             require(games[gameId].state == GameState.Open,"Game not allowing players to Join");
@@ -351,7 +349,7 @@ contract Game is ReentrancyGuard{
         external
         {
             // ---- CHECKS
-            require(msg.sender == games[gameId].player1 && msg.sender != address(0));
+            require(msg.sender == games[gameId].player1);
             require(games[gameId].state == GameState.Open, "Game should be in joining state");
 
             //  ---- EFFECTS
